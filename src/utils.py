@@ -10,6 +10,27 @@ import seaborn as sns
 import time
 
 
+
+# Load Data
+def load_and_split_data():
+    # Reproducibility
+    np.random.seed(42)
+    tf.random.set_seed(42)
+
+    # CIFAR-10 Class Names
+    CLASS_NAMES = ['airplane','automobile','bird','cat','deer',
+    'dog','frog','horse','ship','truck']
+    (x_train_full, y_train_full), (x_test, y_test) = cifar10.load_data()
+
+    x_train = x_train_full[:40000].astype('float32')
+    y_train = y_train_full[:40000]
+
+    x_val = x_train_full[40000:].astype('float32')
+    y_val = y_train_full[40000:]
+
+    x_test = x_test.astype('float32')
+
+    return x_train, y_train, x_val, y_val, x_test, y_test
 # Load Data
 (x_train_full, y_train_full), (x_test, y_test) = cifar10.load_data()
 
@@ -63,4 +84,38 @@ def BaselineCNN():
         layers.Dense(128, activation= "relu"),
         layers.Dense(10, activation= "softmax")
     ])
+    return model
+
+# Experiment C
+def run_Experiment_C():
+    print("Experiment C: Standardization per-channel")
+
+    # Load data
+    x_train, y_train, x_val, y_val, x_test, y_test = load_and_split_data()
+
+    # Standardization
+    mean = np.mean(x_train, axis=(0, 1, 2))
+    std = np.std(x_train, axis=(0, 1, 2))
+
+    x_train_C = (x_train - mean) / std
+    x_val_C = (x_val - mean) / std
+    x_test_C = (x_test - mean) / std
+
+    # Build model
+    model_C = BaselineCNN()
+    model_C.compile(
+        optimizer=keras.optimizers.Adam(learning_rate=0.001),
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
+
+    # Train & Evaluate
+    history, acc, loss, t = train_and_evaluate(
+        model_C,   
+        x_train_C, y_train,
+        x_val_C, y_val,
+        x_test_C, y_test
+    )
+
+    return history, acc, loss, t
     return model
