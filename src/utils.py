@@ -1,12 +1,10 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers, models, callbacks
+from tensorflow.keras import layers, models
 from tensorflow.keras.datasets import cifar10
 from tensorflow.keras.utils import to_categorical
 from sklearn.metrics import confusion_matrix, classification_report
-import seaborn as sns
 import time
 
 
@@ -31,15 +29,6 @@ def load_and_split_data():
     x_test = x_test.astype('float32')
 
     return x_train, y_train, x_val, y_val, x_test, y_test
-# Load Data
-(x_train_full, y_train_full), (x_test, y_test) = cifar10.load_data()
-
-# Fixed Split: 40,000 train / 10,000 val / 10,000 test
-x_train = x_train_full[:40000].astype('float32')
-y_train = y_train_full[:40000]
-x_val = x_train_full[40000:].astype('float32')
-y_val = y_train_full[40000:]
-x_test = x_test.astype('float32')
 
 
 def train_and_evaluate(model, x_tr, y_tr, x_v, y_v, x_te, y_te,
@@ -61,16 +50,6 @@ epochs=20, batch_size=128, extra_callbacks=None, aug=False):
     print(f"Test Acc: {test_acc:.4f} | Test Loss: {test_loss:.4f} | Time:{elapsed:.1f}s")
     return history, test_acc, test_loss, elapsed
 
-def plot_curves(histories, labels, metric='val_accuracy', title='', ylabel=''):
-    plt.figure(figsize=(10, 6))
-    for h, lbl in zip(histories, labels):
-        plt.plot(h.history[metric], label=lbl)
-    plt.xlabel('Epoch')
-    plt.ylabel(ylabel if ylabel else metric)
-    plt.title(title)
-    plt.legend()
-    plt.grid(True)
-    plt.show()
 
 # build baseline model for CNN
 def BaselineCNN():
@@ -118,4 +97,3 @@ def run_Experiment_C():
     )
 
     return history, acc, loss, t
-    return model
